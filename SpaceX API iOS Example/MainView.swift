@@ -16,32 +16,54 @@ struct MainView: View {
         .autoconnect()
     
     @State private var launches: [DataObject] = []
+    @State private var selectedObject: DataObject? = nil
     
     var vc: UIViewController?
     
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(launches) { obj in
-                    if orientation.isLandscape {
-                        DataObjectViewCompact(obj: obj)
-                            .onTapGesture {
-                                vc?.show(DetailViewController(object: obj), sender: nil)
-                            }
-                    } else {
+        if (orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone) || UIDevice.current.userInterfaceIdiom == .pad {
+            HStack {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(launches) { obj in
+                            DataObjectView(obj: obj)
+                                .onTapGesture {
+                                    selectedObject = obj
+                                }
+                        }
+                    }
+                }
+                .frame(width: 250)
+                Divider()
+                if let selectedObject = selectedObject {
+                    DataObjectView(obj: selectedObject)
+                }
+                Spacer()
+            }
+            .onAppear {
+                getData()
+            }
+            .onReceive(orientationChanged) { _ in
+                self.orientation = UIDevice.current.orientation
+            }
+        } else {
+            ScrollView {
+                LazyVStack {
+                    ForEach(launches) { obj in
                         DataObjectView(obj: obj)
                             .onTapGesture {
-                                vc?.show(DetailViewController(object: obj), sender: nil)
+                                let detailVC = DetailViewController(object: obj)
+                                vc?.show(detailVC, sender: vc)
                             }
                     }
                 }
             }
-        }
-        .onAppear {
-            getData()
-        }
-        .onReceive(orientationChanged) { _ in
-            self.orientation = UIDevice.current.orientation
+            .onAppear {
+                getData()
+            }
+            .onReceive(orientationChanged) { _ in
+                self.orientation = UIDevice.current.orientation
+            }
         }
     }
     
@@ -65,7 +87,7 @@ struct DataObjectView: View {
             } placeholder: {
                 Color.gray
             }
-            .frame(width: 250, height: 250)
+            .frame(width: 200, height: 200)
             Text("Mission: \(obj.missionName ?? "No name")")
             Text("Rocket: \(obj.rocketName)")
             Text("Launch site: \(obj.launchSite.siteName ?? "")")

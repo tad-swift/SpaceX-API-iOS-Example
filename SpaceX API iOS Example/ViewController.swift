@@ -11,9 +11,11 @@ import SwiftUI
 class ViewController: UIViewController {
     
     var hostingController: UIHostingController<MainView>!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Launches"
+        view.backgroundColor = .systemBackground
         var mainView = MainView()
         mainView.vc = self
         hostingController = UIHostingController(rootView: mainView)
@@ -22,9 +24,8 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        hostingController.view.frame = view.bounds
+        hostingController.view.frame = view.safeAreaLayoutGuide.layoutFrame
     }
-
 
 }
 

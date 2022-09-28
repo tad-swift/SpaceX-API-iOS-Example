@@ -23,12 +23,13 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         view.addSubview(hostingController.view)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        hostingController.view.frame = view.bounds
+        hostingController.view.frame = view.safeAreaLayoutGuide.layoutFrame
     }
     
     
