@@ -30,13 +30,19 @@ struct MainView: View {
                                 .onTapGesture {
                                     selectedObject = obj
                                 }
+                            Divider()
                         }
                     }
                 }
-                .frame(width: 250)
+                .frame(width: 300)
                 Divider()
                 if let selectedObject = selectedObject {
-                    DataObjectView(obj: selectedObject)
+                    ScrollView {
+                        VStack {
+                            DataObjectView(obj: selectedObject)
+                                .padding()
+                        }
+                    }
                 }
                 Spacer()
             }
@@ -52,9 +58,11 @@ struct MainView: View {
                     ForEach(launches) { obj in
                         DataObjectView(obj: obj)
                             .onTapGesture {
+                                selectedObject = obj
                                 let detailVC = DetailViewController(object: obj)
                                 vc?.show(detailVC, sender: vc)
                             }
+                        Divider()
                     }
                 }
             }
@@ -89,36 +97,20 @@ struct DataObjectView: View {
             }
             .frame(width: 200, height: 200)
             Text("Mission: \(obj.missionName ?? "No name")")
+                .bold()
             Text("Rocket: \(obj.rocketName)")
             Text("Launch site: \(obj.launchSite.siteName ?? "")")
+            Text("Launch date: \(date())")
         }
     }
-}
-
-struct DataObjectViewCompact: View {
     
-    var obj: DataObject
-    
-    var body: some View {
-        HStack {
-            VStack {
-                AsyncImage(url: obj.launchPatchImage) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } placeholder: {
-                    Color.gray
-                }
-                .frame(width: 100, height: 100)
-                
-            }
-            VStack {
-                Text("Mission: \(obj.missionName ?? "No name")")
-                Text("Rocket name: \(obj.rocketName)")
-            }
-            
-        }
-        
+    private func date() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+        dateFormatter.locale = Locale.current
+        let date = Date(timeIntervalSince1970: TimeInterval(obj.launchDate))
+        return dateFormatter.string(from: date)
     }
 }
 
